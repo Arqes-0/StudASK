@@ -1,2 +1,2 @@
 # StudAsk
-Program to make people study 
+Program to help people study 
