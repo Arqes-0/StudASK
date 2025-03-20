@@ -7,7 +7,10 @@ size_t bufferSize = 0;
 ssize_t characters;
 FILE* fileptr;
 
+int getID();
+
 void writeAsk(){
+	int id =getID();
 	printf("Write the ask:");
 	characters = getline(&line, &bufferSize, stdin);
 
@@ -15,7 +18,8 @@ void writeAsk(){
 
 	fileptr = fopen("Storage","a");
 	if (NULL == fileptr) {printf ("Error opening the file :(");exit(0);}
-	fprintf(fileptr, "%s:!!\n",line); //Add ::!! to easier to parse
+	
+	fprintf(fileptr, "%04d%s:!!\n",id+1,line); //Add ::!! to easier to parse
 
 
 	fclose(fileptr);
@@ -30,14 +34,12 @@ void readAsk(){
 		printf("%s",line);
 
 	}
-	printf("test2\n"); 
 	fclose(fileptr);
 
 }
 
 
 int getID(){
-	printf("test1");
 	fileptr = fopen("Storage","r");
 	while (getline(&line,&bufferSize,fileptr)!=-1){}
 	fclose(fileptr);
@@ -73,7 +75,6 @@ switch (selector){
 	break;
 	case 2:
 	readAsk();
-	printf("test3");
 	int coso = getID();
 	printf("%d\n",coso);
 	break;
