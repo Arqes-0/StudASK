@@ -12,7 +12,7 @@ int getID();
 void writeAsk(){
 	int id =getID();
 	printf("Write the ask:");
-	characters = getline(&line, &bufferSize, stdin);
+	characters = getline(&line, &bufferSize, stdin); //get ask line
 
 	line[characters-1]=':'; //Erase \n character
 
@@ -31,7 +31,7 @@ void readAsk(){
 	if (NULL == fileptr) {printf ("Error opening the file :(");exit(0);}
 	while (getline(&line,&bufferSize,fileptr)!=-1){
 
-		printf("%s",line);
+		printf("%s",line); //read all lines
 
 	}
 	fclose(fileptr);
@@ -39,7 +39,7 @@ void readAsk(){
 }
 
 
-int getID(){
+int getID(){ //This function is to get the last id of the questions
 	fileptr = fopen("Storage","r");
 	while (getline(&line,&bufferSize,fileptr)!=-1){}
 	fclose(fileptr);
@@ -66,6 +66,8 @@ else printf("Main storage file found\n");
 a:
 printf("please select write or read from storage: \n");
 printf("Write(1)\tRead(2)\n");
+
+//Main Menu Code
 int selector = 0;
 scanf("%d",&selector);
 getchar();
