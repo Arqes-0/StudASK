@@ -1,6 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+
+//to create subdirectories
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <dirent.h>
+
 //global variables
 char *line = NULL;
 size_t bufferSize = 0;
@@ -8,6 +15,38 @@ ssize_t characters;
 FILE* fileptr;
 
 int getLastID();
+
+void createFolder(char name[255]){
+	char path[400];
+	const char *home = getenv("HOME");
+	if (home != NULL){
+	snprintf(path, sizeof(path), "%s/StudAsk/",home);
+	DIR *dir = opendir(path);
+	if (dir){
+	closedir(dir);}
+	else{
+
+	if(mkdir(path, 0777)==0){
+                printf("Folder created in: %s\n",path);
+
+       }
+	}
+	strcat(path,name);
+	
+	}
+	if(mkdir(path, 0777)==0){
+		printf("Folder created in: %s\n",path);
+	
+	}
+	else printf("Error creating folder, %s",path);
+	
+	}
+
+
+
+
+
+
 
 char* concatString(char *s1, char *s2, char *s3, char *s4){
 	size_t totalLength = strlen(s1) + strlen (s2) + strlen (s3) + strlen (s4) + 5;
@@ -117,7 +156,7 @@ else printf("Main storage file found\n");
 
 a:
 printf("please select write or read from storage: \n");
-printf("Write(1)\tRead(2)\n");
+printf("Write(1)\tCreate new folder(2)\tRead(3)\n");
 
 //Main Menu Code
 int selector = 0;
@@ -128,6 +167,12 @@ switch (selector){
 	writeAsk();
 	break;
 	case 2:
+	char folder[255];
+	printf("Please enter the name of the folder: ");
+	scanf("%s",&folder);
+	createFolder(folder);
+	break;
+	case 3:
 	readAsk();
 	int coso = getLastID();
 	printf("%d\n",coso);
