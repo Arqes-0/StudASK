@@ -1,4 +1,4 @@
-// TODO: APLICAR LO DE ALATORIO DE PREGUNTAS CON EL INDICE DESORDENADO
+// TODO:
 // CORREGIR ESTETICA Y POR ULTIMO AÑADIR TOPICS
 
 #include <stdio.h>
@@ -51,7 +51,7 @@ char *concatString(char *s1, char *s2, char *s3, char *s4) {
   char *text = "!::";
   char *result = malloc(sizeof(char) * totalLength);
   if (result == NULL) {
-    printf("error asigning malloc result");
+    printf("error asigning malloc result ConcatString");
     exit(1);
   }
   strcpy(result, s1);
@@ -86,8 +86,9 @@ void writeAsk() {
   s2[c2 - 1] = '!';
   s3[c3 - 1] = '!';
   s4[c4 - 1] = '\0';
+
   char *result = concatString(s1, s2, s3, s4);
-  // agregar ! a todas menos la 4 para sustituir \n
+  // add ! to substitute \n or \0
   free(s1);
   free(s2);
   free(s3);
@@ -103,6 +104,7 @@ void writeAsk() {
           result); // Add ::!! to easier to parse
 
   fclose(fileptr);
+  free(result);
 }
 
 void shuffle(int arr[], int n) {
@@ -111,6 +113,13 @@ void shuffle(int arr[], int n) {
     int temp = arr[i];
     arr[i] = arr[j];
     arr[j] = temp;
+  }
+}
+void cleanString(char *str) {
+  size_t len = strlen(str);
+  // Si el último carácter es un salto de línea o espacio, lo eliminamos
+  if (len > 0 && (str[len - 1] == '\n' || str[len - 1] == '\r')) {
+    str[len - 1] = '\0';
   }
 }
 
@@ -128,13 +137,12 @@ void readAsk() {
     printf("Error opening the file :(");
     exit(0);
   }
-  printf("Starting random questions");
+  printf("Starting random questions\n");
   sleep(2);
   for (int I = 0; I < end; I++) {
+    rewind(fileptr);
     int lineToRead = index[I];
     int lineRed = -1;
-    /// MODIFICAR LO ANTERIOR PARA ALEATORIZAR LAS PREGUNTAS
-
     char ID[4] = {0};
     int status = 0;
     while (status != -1 && lineToRead != lineRed) {
@@ -145,15 +153,16 @@ void readAsk() {
       lineRed = atoi(ID);
     }
 
-    // Extraer respuestas con strtok()
+    // Extract answers with strtok()
     strtok(line, "::!!");
     char *question = strtok(NULL, "::!!");
     printf("Question: %s\n", question);
     char *answers[MAX_RESPUESTAS];
-    answers[0] = strtok(NULL, "!!::"); // Respuesta correcta
+    answers[0] = strtok(NULL, "!!::"); // Right correcta
     answers[1] = strtok(NULL, "!!::");
     answers[2] = strtok(NULL, "!!::");
     answers[3] = strtok(NULL, "!!::");
+    answers[3][strlen(answers[3]) - 1] = '\0';
 
     if (!answers[0] || !answers[1] || !answers[2] || !answers[3]) {
       printf("Error parsing answers.\n");
@@ -162,31 +171,35 @@ void readAsk() {
       return;
     }
 
-    // Mezclar respuestas
+    // shuffle answers
     int indices[MAX_RESPUESTAS] = {0, 1, 2, 3};
     srand(time(NULL));
     shuffle(indices, MAX_RESPUESTAS);
 
-    // Imprimir respuestas en orden aleatorio
-    printf("Seleccione la respuesta correcta:\n");
+    // print answers in random positions
+    printf("Please select the right answer\n");
     for (int i = 0; i < MAX_RESPUESTAS; i++) {
-      printf("%d) %s\n", i + 1, answers[indices[i]]);
+      printf("(%d) %s\n", i + 1, answers[indices[i]]);
     }
 
-    // Obtener la respuesta del usuario
+    // Get users choice
+    char z = 'a';
+  Ganswer:
+    z = 'a';
     int userChoice;
-    printf("Ingrese el número de su respuesta: ");
+    printf("Your Choice: ");
     scanf("%d", &userChoice);
 
     // Validar la respuesta
     if (userChoice >= 1 && userChoice <= MAX_RESPUESTAS) {
       if (strcmp(answers[indices[userChoice - 1]], answers[0]) == 0) {
-        printf("¡Correcto!\n");
+        printf("¡YOU ARE RIGHT!\n");
       } else {
-        printf("Incorrecto. La respuesta correcta era: %s\n", answers[0]);
+        printf("Wrong answer. The right answer is: %s\n", answers[0]);
       }
     } else {
-      printf("Opción inválida.\n");
+      printf("Invalid option, please try again\n");
+      goto Ganswer;
     }
   }
   fclose(fileptr);
@@ -202,7 +215,10 @@ void printDirectories() {
     struct dirent *dir;
     if (d) {
       while ((dir = readdir(d)) != NULL) {
-        printf("%s\n", dir->d_name);
+        // to dont print "." and ".."
+        if (strcmp(dir->d_name, ".") != 0 && strcmp(dir->d_name, "..") != 0) {
+          printf("%s\n", dir->d_name);
+        }
       }
       closedir(d);
     }
@@ -210,6 +226,7 @@ void printDirectories() {
 }
 
 int getLastID() { // This function is to get the last id of the questions
+                  // maybe better with getchar
   fileptr = fopen("Storage", "r");
   while (getline(&line, &bufferSize, fileptr) != -1) {
   }
@@ -225,6 +242,7 @@ int getLastID() { // This function is to get the last id of the questions
 int main() {
 
   /* inicialize of the code, checking for storage file */
+  // NOT NEEDED IN NEW VERSION
   if ((fileptr = fopen("Storage", "r")) == NULL) {
     printf("Error opening main storage file\n");
     printf("Creating main storage file...\n");
@@ -254,8 +272,9 @@ a:
     break;
   case 3:
     readAsk();
-    int coso = getLastID();
-    printf("%d\n", coso);
+    break;
+  case 4:
+    printDirectories();
     break;
   default:
     printf("Error in selection\n");
