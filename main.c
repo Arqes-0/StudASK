@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <unistd.h>
 // to create subdirectories
 #include <dirent.h>
 #include <sys/stat.h>
@@ -115,70 +115,80 @@ void shuffle(int arr[], int n) {
 }
 
 void readAsk() {
+
+  int end = getLastID();
+  int index[end];
+
+  for (int i = 0; i < end; i++) {
+    index[i] = i + 1;
+  }
+  shuffle(index, end);
   fileptr = fopen("Storage", "r");
   if (NULL == fileptr) {
     printf("Error opening the file :(");
     exit(0);
   }
-  printf("What line do you want to read? ");
-  int lineToRead = 0;
-  int lineRed = -1;
-  scanf("%d", &lineToRead);
-  getchar();
-  char ID[4] = {0};
-  int status = 0;
-  while (status != -1 && lineToRead != lineRed) {
-    status = getline(&line, &bufferSize, fileptr);
-    for (int i = 0; i < 4; i++) {
-      ID[i] = line[i];
+  printf("Starting random questions");
+  sleep(2);
+  for (int I = 0; I < end; I++) {
+    int lineToRead = index[I];
+    int lineRed = -1;
+    /// MODIFICAR LO ANTERIOR PARA ALEATORIZAR LAS PREGUNTAS
+
+    char ID[4] = {0};
+    int status = 0;
+    while (status != -1 && lineToRead != lineRed) {
+      status = getline(&line, &bufferSize, fileptr);
+      for (int i = 0; i < 4; i++) {
+        ID[i] = line[i];
+      }
+      lineRed = atoi(ID);
     }
-    lineRed = atoi(ID);
-  }
 
-  // Extraer respuestas con strtok()
-  strtok(line, "::!!");
-  char *question = strtok(NULL, "::!!");
-  printf("Question: %s\n", question);
-  char *answers[MAX_RESPUESTAS];
-  answers[0] = strtok(NULL, "!!::"); // Respuesta correcta
-  answers[1] = strtok(NULL, "!!::");
-  answers[2] = strtok(NULL, "!!::");
-  answers[3] = strtok(NULL, "!!::");
+    // Extraer respuestas con strtok()
+    strtok(line, "::!!");
+    char *question = strtok(NULL, "::!!");
+    printf("Question: %s\n", question);
+    char *answers[MAX_RESPUESTAS];
+    answers[0] = strtok(NULL, "!!::"); // Respuesta correcta
+    answers[1] = strtok(NULL, "!!::");
+    answers[2] = strtok(NULL, "!!::");
+    answers[3] = strtok(NULL, "!!::");
 
-  if (!answers[0] || !answers[1] || !answers[2] || !answers[3]) {
-    printf("Error parsing answers.\n");
-    free(line);
-    fclose(fileptr);
-    return;
-  }
+    if (!answers[0] || !answers[1] || !answers[2] || !answers[3]) {
+      printf("Error parsing answers.\n");
+      free(line);
+      fclose(fileptr);
+      return;
+    }
 
-  // Mezclar respuestas
-  int indices[MAX_RESPUESTAS] = {0, 1, 2, 3};
-  srand(time(NULL));
-  shuffle(indices, MAX_RESPUESTAS);
+    // Mezclar respuestas
+    int indices[MAX_RESPUESTAS] = {0, 1, 2, 3};
+    srand(time(NULL));
+    shuffle(indices, MAX_RESPUESTAS);
 
-  // Imprimir respuestas en orden aleatorio
-  printf("Seleccione la respuesta correcta:\n");
-  for (int i = 0; i < MAX_RESPUESTAS; i++) {
-    printf("%d) %s\n", i + 1, answers[indices[i]]);
-  }
+    // Imprimir respuestas en orden aleatorio
+    printf("Seleccione la respuesta correcta:\n");
+    for (int i = 0; i < MAX_RESPUESTAS; i++) {
+      printf("%d) %s\n", i + 1, answers[indices[i]]);
+    }
 
-  // Obtener la respuesta del usuario
-  int userChoice;
-  printf("Ingrese el número de su respuesta: ");
-  scanf("%d", &userChoice);
+    // Obtener la respuesta del usuario
+    int userChoice;
+    printf("Ingrese el número de su respuesta: ");
+    scanf("%d", &userChoice);
 
-  // Validar la respuesta
-  if (userChoice >= 1 && userChoice <= MAX_RESPUESTAS) {
-    if (strcmp(answers[indices[userChoice - 1]], answers[0]) == 0) {
-      printf("¡Correcto!\n");
+    // Validar la respuesta
+    if (userChoice >= 1 && userChoice <= MAX_RESPUESTAS) {
+      if (strcmp(answers[indices[userChoice - 1]], answers[0]) == 0) {
+        printf("¡Correcto!\n");
+      } else {
+        printf("Incorrecto. La respuesta correcta era: %s\n", answers[0]);
+      }
     } else {
-      printf("Incorrecto. La respuesta correcta era: %s\n", answers[0]);
+      printf("Opción inválida.\n");
     }
-  } else {
-    printf("Opción inválida.\n");
   }
-
   fclose(fileptr);
   free(line);
 }
