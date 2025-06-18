@@ -139,7 +139,7 @@ void shuffle(int arr[], int n) {
 }
 void cleanString(char *str) {
   size_t len = strlen(str);
-  // Si el último carácter es un salto de línea o espacio, lo eliminamos
+  // If the last character is a newline or carriage return, substitute it with \0 <- end of string
   if (len > 0 && (str[len - 1] == '\n' || str[len - 1] == '\r')) {
     str[len - 1] = '\0';
   }
@@ -182,7 +182,7 @@ void readAsk(char *topicRA) {
     char *question = strtok(NULL, "::!!");
     printf("*Q: %s\n\n", question);
     char *answers[MAX_RESPUESTAS];
-    answers[0] = strtok(NULL, "!!::"); // Right correcta
+    answers[0] = strtok(NULL, "!!::"); // Right answer
     answers[1] = strtok(NULL, "!!::");
     answers[2] = strtok(NULL, "!!::");
     answers[3] = strtok(NULL, "!!::");
