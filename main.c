@@ -139,7 +139,7 @@ void shuffle(int arr[], int n) {
 }
 void cleanString(char *str) {
   size_t len = strlen(str);
-  // If the last character is a newline or carriage return, substitute it with \0 <- end of string
+  // Si el último carácter es un salto de línea o espacio, lo eliminamos
   if (len > 0 && (str[len - 1] == '\n' || str[len - 1] == '\r')) {
     str[len - 1] = '\0';
   }
@@ -182,7 +182,7 @@ void readAsk(char *topicRA) {
     char *question = strtok(NULL, "::!!");
     printf("*Q: %s\n\n", question);
     char *answers[MAX_RESPUESTAS];
-    answers[0] = strtok(NULL, "!!::"); // Right answer
+    answers[0] = strtok(NULL, "!!::"); // Right correcta
     answers[1] = strtok(NULL, "!!::");
     answers[2] = strtok(NULL, "!!::");
     answers[3] = strtok(NULL, "!!::");
@@ -190,7 +190,12 @@ void readAsk(char *topicRA) {
 
     if (!answers[0] || !answers[1] || !answers[2] || !answers[3]) {
       printf("Error parsing answers.\n");
-      free(line);
+
+      if (line) {
+        free(line);
+        line = NULL;
+      }
+
       fclose(fileptr);
       return;
     }
@@ -231,7 +236,10 @@ void readAsk(char *topicRA) {
     }
   }
   fclose(fileptr);
-  free(line);
+  if (line) {
+    free(line);
+    line = NULL;
+  }
   getchar();
   printf("END OF QUESTIONS!\nPress any key to continue!");
   getchar();
@@ -271,10 +279,14 @@ int getLastID(char *path) { // This function is to get the last id of the
 }
 void AskTopic() {
   char topicVar[256];
-  printf("Plase select one of the following topics:\n\n");
+  printf("Plase select one of the following topics:\n(exit) to go back\n\n");
   printDirectories();
   printf("Your selection: ");
   scanf("%s", topicVar);
+  if (strcmp(topicVar, "exit") == 0) {
+    return;
+  }
+
   getchar();
   system("clear");
   printf("Starting random %s Questions!!!\n", topicVar);
@@ -284,10 +296,13 @@ void AskTopic() {
 }
 void WriteTopic() {
   char topicVar[256];
-  printf("Please select one of the following topics:\n");
+  printf("Please select one of the following topics:\n(exit) to go back\n");
   printDirectories();
   printf("Your selection: ");
   scanf("%s", topicVar);
+  if (strcmp(topicVar, "exit") == 0) {
+    return;
+  }
   getchar();
   writeAsk(topicVar);
 }
@@ -321,8 +336,11 @@ a:
   case 2:
     system("clear");
     char folder[255];
-    printf("Please enter the name of the folder: ");
+    printf("Please enter the name of the folder:\n(exit) to go back ");
     scanf("%s", folder);
+    if (strcmp(folder, "exit") == 0) {
+      break;
+    }
     createFolder(folder);
     goto a;
     break;
@@ -339,6 +357,9 @@ a:
     getchar();
     goto a;
   }
-  free(line);
+  if (line) {
+    free(line);
+    line = NULL;
+  }
   return 0;
 }
